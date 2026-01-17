@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Supabase Test</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <h2>Supabase Database Test</h2>
+
+  <input id="name" placeholder="Name"><br><br>
+  <input id="msg" placeholder="Message"><br><br>
+  <button onclick="sendData()">Send</button>
+
+  <h3>Messages:</h3>
+  <ul id="list"></ul>
+
+<script>
+  const supabaseUrl = "https://feuahghcqpetfhwvtkam.supabase.co";
+  const supabaseKey = "sb_publishable_i7zl1N1E3C_Xb5sVl4DNvA_Afy5su2x";
+
+  const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+  async function sendData() {
+    const name = document.getElementById("name").value;
+    const message = document.getElementById("msg").value;
+
+    const { error } = await supabase
+      .from("test_messages")
+      .insert([{ name, message }]);
+
+    if (error) {
+      alert("Error: " + error.message);
+    } else {
+      alert("Data inserted!");
+      loadData();
+    }
+  }
+
+  async function loadData() {
+    const { data, error } = await supabase
+      .from("test_messages")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (!error) {
+      const list = document.getElementById("list");
+      list.innerHTML = "";
+      data.forEach(d => {
+        list.innerHTML += `<li><b>${d.name}</b>: ${d.message}</li>`;
+      });
+    }
+  }
+
+  loadData();
+</script>
+
+</body>
+</html>
